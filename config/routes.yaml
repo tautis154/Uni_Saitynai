@@ -1,3 +1,159 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+#Doctor
+doctors_list:
+  path: /api/doctors
+  controller: App\Controller\DoctorController:listAction
+  methods: [GET]
+
+doctor_create:
+  path: /api/doctors/create
+  controller: App\Controller\DoctorController:newAction
+  methods: [POST]
+
+doctor_find:
+  path: /api/doctors/{id}
+  controller: App\Controller\DoctorController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+doctor_delete:
+  path: /api/doctors/{id}/delete
+  controller: App\Controller\DoctorController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+doctor_edit:
+  path: /api/doctors/{id}/edit
+  controller: App\Controller\DoctorController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
+
+#Admin
+admins_list:
+  path: /api/admins
+  controller: App\Controller\AdminController:listAction
+  methods: [GET]
+
+admin_create:
+  path: /api/admins/create
+  controller: App\Controller\AdminController:newAction
+  methods: [POST]
+
+admin_find:
+  path: /api/admins/{id}
+  controller: App\Controller\AdminController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+admin_delete:
+  path: /api/admins/{id}/delete
+  controller: App\Controller\AdminController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+admin_edit:
+  path: /api/admins/{id}/edit
+  controller: App\Controller\AdminController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
+
+#Visit
+visits_list:
+  path: /api/visits
+  controller: App\Controller\VisitController:listAction
+  methods: [GET]
+
+visit_create:
+  path: /api/visits
+  controller: App\Controller\VisitController:newAction
+  methods: [POST]
+
+visit_find:
+  path: /api/visits/{id}
+  controller: App\Controller\VisitController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+visit_delete:
+  path: /api/visits/{id}
+  controller: App\Controller\VisitController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+visit_edit:
+  path: /api/visits/{id}
+  controller: App\Controller\VisitController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
+
+#Review
+reviews_list:
+  path: /api/doctors/{doctor_id}/reviews
+  controller: App\Controller\ReviewController:listAction
+  methods: [GET]
+
+review_create:
+  path: /api/doctors/{doctor_id}/reviews
+  controller: App\Controller\ReviewController:newAction
+  methods: [POST]
+
+review_find:
+  path: /api/doctors/{doctor_id}/reviews/{review_id}
+  controller: App\Controller\ReviewController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+review_delete:
+  path: /api/doctors/{doctor_id}/reviews/{review_id}
+  controller: App\Controller\ReviewController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+review_edit:
+  path: /api/doctors/{doctor_id}/reviews/{review_id}
+  controller: App\Controller\ReviewController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
+
+#Medicine
+medicines_list:
+  path: /api/medicines
+  controller: App\Controller\MedicineController:listAction
+  methods: [GET]
+
+medicine_create:
+  path: /api/medicines
+  controller: App\Controller\MedicineController:newAction
+  methods: [POST]
+
+medicine_find:
+  path: /api/medicines/{id}
+  controller: App\Controller\MedicineController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+medicine_delete:
+  path: /api/medicines/{id}
+  controller: App\Controller\MedicineController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+medicine_edit:
+  path: /api/visits/{id}
+  controller: App\Controller\MedicineController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
