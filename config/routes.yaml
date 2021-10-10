@@ -37,7 +37,7 @@ admins_list:
   methods: [GET]
 
 admin_create:
-  path: /api/admins/create
+  path: /api/admins
   controller: App\Controller\AdminController:newAction
   methods: [POST]
 
@@ -49,14 +49,14 @@ admin_find:
     id: '\d+'
 
 admin_delete:
-  path: /api/admins/{id}/delete
+  path: /api/admins/{id}
   controller: App\Controller\AdminController:deleteAction
   methods: [DELETE]
   requirements:
     id: '\d+'
 
 admin_edit:
-  path: /api/admins/{id}/edit
+  path: /api/admins/{id}
   controller: App\Controller\AdminController:editAction
   methods: [PUT]
   requirements:
