@@ -5,7 +5,7 @@ doctors_list:
   methods: [GET]
 
 doctor_create:
-  path: /api/doctors/create
+  path: /api/doctors
   controller: App\Controller\DoctorController:newAction
   methods: [POST]
 
@@ -17,14 +17,14 @@ doctor_find:
     id: '\d+'
 
 doctor_delete:
-  path: /api/doctors/{id}/delete
+  path: /api/doctors/{id}
   controller: App\Controller\DoctorController:deleteAction
   methods: [DELETE]
   requirements:
     id: '\d+'
 
 doctor_edit:
-  path: /api/doctors/{id}/edit
+  path: /api/doctors/{id}
   controller: App\Controller\DoctorController:editAction
   methods: [PUT]
   requirements:
