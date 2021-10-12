@@ -152,7 +152,7 @@ medicine_delete:
     id: '\d+'
 
 medicine_edit:
-  path: /api/visits/{id}
+  path: /api/medicines/{id}
   controller: App\Controller\MedicineController:editAction
   methods: [PUT]
   requirements:

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -26,8 +27,7 @@ class Review
     private $clientName;
 
     /**
-     * @Assert\NotBlank
-     * @ORM\ManyToOne(targetEntity=Doctor::class, inversedBy="reviews")
+     * @ORM\ManyToOne(targetEntity=Doctor::class, inversedBy="reviews",  fetch="EAGER")
      */
     private $doctor;
 

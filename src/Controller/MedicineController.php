@@ -29,15 +29,11 @@ class MedicineController extends AbstractApiController
 
         $form->handleRequest($request);
 
-        return $this->respond('Veikia');
-
         if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 
         $medicine = $form->getData();
-
-
 
         try {
             $this->getDoctrine()->getManager()->persist($medicine);
@@ -46,29 +42,32 @@ class MedicineController extends AbstractApiController
             return $this->respond('Internal Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->respond('Veikia');
+        return $this->respond($medicine, Response::HTTP_CREATED);
     }
 
     public function listAction(Request $request): Response
     {
         $medicines = $this->getDoctrine()->getRepository(Medicine::class)->findAll();
 
+        if (!$medicines) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($medicines);
     }
 
     public function findAction(Request $request)
     {
-        $medicineId = $request->get('medicine_id');
-
-        if (!$medicineId) {
-            throw new NotFoundHttpException();
-        }
+        $medicineId = $request->get('id');
 
         $medicine = $this->getDoctrine()->getRepository(Medicine::class)->findOneBy([
             'id' => $medicineId,
         ]);
 
-        return $this->respond('Veikia');
+        if (!$medicine) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($medicine);
     }
 
@@ -76,47 +75,44 @@ class MedicineController extends AbstractApiController
     {
         $medicineId = $request->get('id');
 
-        if (!$medicineId) {
-            throw new NotFoundHttpException();
-        }
-
         $medicine = $this->getDoctrine()->getRepository(Medicine::class)->findOneBy([
             'id' => $medicineId,
         ]);
 
-        //   $this->getDoctrine()->getManager()->remove($doctor);
-        //  $this->getDoctrine()->getManager()->flush();
+        if (!$medicine) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
 
-        return $this->respond('Successfully removed review');
+        $this->getDoctrine()->getManager()->remove($medicine);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->respond('Successfully removed', Response::HTTP_NO_CONTENT);
     }
 
     public function editAction(Request $request)
     {
-        $medicineId = $request->get('review_id');
+        $medicineId = $request->get('id');
 
-        if (!$medicineId) {
-            throw new NotFoundHttpException('Medicine not found');
-        }
 
         $medicine = $this->getDoctrine()->getRepository(Medicine::class)->findOneBy([
-            'id' => $medicineId,
+            'id' => $medicineId
         ]);
 
-        $form = $this->buildForm(ReviewType::class, $medicine, [
+        if (!$medicine) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->buildForm(MedicineType::class, $medicine, [
             'method' => $request->getMethod(),
         ]);
 
         $form->handleRequest($request);
 
-        return $this->respond('Veikia');
-
-        if (!$form->isSubmitted() || !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 
         $medicine = $form->getData();
-
-
 
         try {
             $this->getDoctrine()->getManager()->persist($medicine);

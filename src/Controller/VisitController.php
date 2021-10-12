@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Admin;
 use App\Entity\Doctor;
+use App\Entity\Medicine;
 use App\Entity\Review;
 
 use App\Entity\Visit;
-use App\Form\AdminType;
 use App\Form\DoctorType;
+use App\Form\MedicineType;
+use App\Form\ReviewType;
 use App\Form\VisitType;
 use App\Repository\ReviewRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -30,13 +31,12 @@ class VisitController extends AbstractApiController
 
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 
         $visit = $form->getData();
 
-        return $this->respond('veikia');
         try {
             $this->getDoctrine()->getManager()->persist($visit);
             $this->getDoctrine()->getManager()->flush();
@@ -44,14 +44,17 @@ class VisitController extends AbstractApiController
             return $this->respond('Internal Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->respond($visit);
+        return $this->respond($visit, Response::HTTP_CREATED);
     }
 
     public function listAction(Request $request): Response
     {
-        $visits = $this->getDoctrine()->getRepository(Admin::class)->findAll();
+        $visits = $this->getDoctrine()->getRepository(Visit::class)->findAll();
 
-        return $this->json('works');
+        if (!$visits) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($visits);
     }
 
@@ -59,59 +62,54 @@ class VisitController extends AbstractApiController
     {
         $visitId = $request->get('id');
 
-        if (!$visitId) {
-            throw new NotFoundHttpException();
-        }
-
-        return $this->json('works');
-
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
             'id' => $visitId,
         ]);
+
+        if (!$visit) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
 
         return $this->json($visit);
     }
 
     public function deleteAction(Request $request): Response
     {
-        $visit = $request->get('id');
-
-        if (!$visit) {
-            throw new NotFoundHttpException();
-        }
-
-        return $this->json('works');
+        $visitId = $request->get('id');
 
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
-            'id' => $visit,
+            'id' => $visitId,
         ]);
 
-        //   $this->getDoctrine()->getManager()->remove($doctor);
-        //  $this->getDoctrine()->getManager()->flush();
+        if (!$visit) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
 
-        return $this->respond('Successfully removed visit');
+        $this->getDoctrine()->getManager()->remove($visit);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->respond('Successfully removed', Response::HTTP_NO_CONTENT);
     }
 
     public function editAction(Request $request)
     {
         $visitId = $request->get('id');
 
-        if (!$visitId) {
-            throw new NotFoundHttpException('Doctor not found');
-        }
-
-        return $this->json('works');
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
-            'id' => $visitId,
+            'id' => $visitId
         ]);
 
-        $form = $this->buildForm(AdminType::class, $visit, [
+        if (!$visit) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->buildForm(VisitType::class, $visit, [
             'method' => $request->getMethod(),
         ]);
 
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 

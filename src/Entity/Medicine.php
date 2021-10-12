@@ -37,12 +37,13 @@ class Medicine
 
     /**
      * @Ignore()
-     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="medicine")
+     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="medicine",  fetch="EAGER")
      */
     private $visits;
 
     /**
-     * @ORM\ManyToMany(targetEntity=DoctorMedicine::class, mappedBy="medicine")
+     * @Ignore()
+     * @ORM\ManyToMany(targetEntity=DoctorMedicine::class, mappedBy="medicine",  fetch="EAGER")
      */
     private $doctorMedicines;
 

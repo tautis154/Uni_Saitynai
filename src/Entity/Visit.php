@@ -20,7 +20,7 @@ class Visit
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Doctor::class, inversedBy="visits")
+     * @ORM\ManyToOne(targetEntity=Doctor::class, inversedBy="visits",  fetch="EAGER")
      */
     private $doctor;
 
@@ -30,17 +30,17 @@ class Visit
     private $clientName;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default":"0"}))
      */
     private $isAdmitted;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default":"0"}))
      */
     private $isFinished;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Medicine::class, inversedBy="visits")
+     * @ORM\ManyToOne(targetEntity=Medicine::class, inversedBy="visits", fetch="EAGER")
      */
     private $medicine;
 
