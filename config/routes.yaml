@@ -95,14 +95,14 @@ visit_edit:
     id: '\d+'
 
 visit_admit:
-  path: /api/doctors/{doctor_id}/visits/{visit_id}
+  path: /api/doctors/{doctor_id}/visits/{visit_id}/admit
   controller: App\Controller\VisitController:admitAction
   methods: [ POST ]
   requirements:
     id: '\d+'
 
 visit_finish:
-  path: /api/doctors/{doctor_id}/visits/{visit_id}
+  path: /api/doctors/{doctor_id}/visits/{visit_id}/finish
   controller: App\Controller\VisitController:finishAction
   methods: [ POST ]
   requirements:
