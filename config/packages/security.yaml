@@ -57,6 +57,8 @@ security:
         - { path: ^/api/doctors/\d+/reviews, roles: ROLE_ADMIN, methods: [PUT, DELETE] }
         - { path: ^/api/doctors$, roles: ROLE_ADMIN}
         - { path: ^/api/doctors/\d+/visits, roles: [ROLE_DOCTOR, ROLE_ADMIN], methods: [GET, DELETE] }
+        - { path: ^/api/doctors/\d+/visits/\d+/admit, roles: [ROLE_ADMIN, ROLE_DOCTOR], methods: [POST] }
+        - { path: ^/api/doctors/\d+/visits/\d+/finish, roles: [ROLE_ADMIN, ROLE_DOCTOR], methods: [POST] }
         - { path: ^/api/doctors/\d+/visits, roles: ROLE_ADMIN, methods: [PUT] }
      #   - { path: ^/api/doctors/\d+$/reviews, roles: ROLE_USER }
 
