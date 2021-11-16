@@ -70,6 +70,68 @@ class VisitController extends AbstractApiController
         }
     }
 
+    public function admitAction(Request $request)
+    {
+        $doctorId = $request->get('doctor_id');
+
+        $visitId = $request->get('visit_id');
+
+        $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
+            'id' => $visitId,
+            'doctor' => $doctorId
+        ]);
+
+        if (!$visit) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'id' => $doctorId,
+        ]);
+
+        $currentUser = $this->getUser();
+
+        if ($doctor->getFkUser() === $currentUser || in_array("ROLE_ADMIN", $currentUser->getRoles(), true)) {
+            $visit->setIsAdmitted(true);
+            $this->getDoctrine()->getManager()->persist($visit);
+            $this->getDoctrine()->getManager()->flush();
+            return $this->json($visit);
+        } else {
+            return $this->respond('403 Access Denied', Response::HTTP_FORBIDDEN);
+        }
+    }
+
+    public function finishAction(Request $request)
+    {
+        $doctorId = $request->get('doctor_id');
+
+        $visitId = $request->get('visit_id');
+
+        $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
+            'id' => $visitId,
+            'doctor' => $doctorId
+        ]);
+
+        if (!$visit) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'id' => $doctorId,
+        ]);
+
+        $currentUser = $this->getUser();
+
+        if ($doctor->getFkUser() === $currentUser || in_array("ROLE_ADMIN", $currentUser->getRoles(), true)) {
+            $visit->setIsFinished(true);
+            $this->getDoctrine()->getManager()->persist($visit);
+            $this->getDoctrine()->getManager()->flush();
+            return $this->json($visit);
+        } else {
+            return $this->respond('403 Access Denied', Response::HTTP_FORBIDDEN);
+        }
+    }
+
     public function findAction(Request $request)
     {
         $doctorId = $request->get('doctor_id');
