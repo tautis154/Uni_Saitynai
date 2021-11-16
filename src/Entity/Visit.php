@@ -29,6 +29,7 @@ class Visit
      */
     private $clientName;
 
+    //Oj ble reikia padaryt dar su tais isAddmited, isFinished
     /**
      * @ORM\Column(type="boolean", options={"default":"0"}))
      */

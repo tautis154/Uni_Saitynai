@@ -2,24 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Doctor;
 use App\Entity\Medicine;
-use App\Entity\Review;
 
-use App\Form\DoctorType;
 use App\Form\MedicineType;
-use App\Form\ReviewType;
-use App\Repository\ReviewRepository;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class MedicineController extends AbstractApiController
 {
@@ -50,6 +37,7 @@ class MedicineController extends AbstractApiController
         $medicines = $this->getDoctrine()->getRepository(Medicine::class)->findAll();
 
         if (!$medicines) {
+            //Jei erroras padaryt, kad grazintu jsona
             return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
         }
 

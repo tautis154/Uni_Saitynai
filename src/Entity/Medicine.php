@@ -37,7 +37,7 @@ class Medicine
 
     /**
      * @Ignore()
-     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="medicine",  fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="medicine", cascade={"persist", "remove"},  fetch="EAGER")
      */
     private $visits;
 

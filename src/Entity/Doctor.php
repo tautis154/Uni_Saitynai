@@ -6,39 +6,22 @@ use App\Repository\DoctorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\Groups;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * @ORM\Entity(repositoryClass=DoctorRepository::class)
  * @ORM\Table(name="`doctor`")
+ * @UniqueEntity(fields={"fk_user"}, message="There is already an doctor with this user_id")
  */
-class Doctor implements PasswordAuthenticatedUserInterface
+class Doctor
 {
     /**
-     * @Groups("doctor")
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @Groups("doctor")
-     * @ORM\Column(type="string", length=180, unique=true)
-     * @Serializer\Groups("newAction")
-     */
-    private $username;
-
-    /**
-     * @Groups("doctor")
-     * @var string The hashed password
-     * @ORM\Column(type="string")
-     */
-    private $password;
 
     /**
      * @Ignore()
@@ -47,14 +30,13 @@ class Doctor implements PasswordAuthenticatedUserInterface
     private $reviews;
 
     /**
-     * @Groups("doctor")
      * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
      * @Ignore()
-     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="doctor")
+     * @ORM\OneToMany(targetEntity=Visit::class, mappedBy="doctor",  cascade={"persist", "remove"})
      */
     private $visits;
 
@@ -63,6 +45,12 @@ class Doctor implements PasswordAuthenticatedUserInterface
      * @ORM\ManyToMany(targetEntity=DoctorMedicine::class, mappedBy="doctor")
      */
     private $doctorMedicines;
+
+    /**
+     * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"}, fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false,  unique=true)
+     */
+    private $fk_user;
 
     public function __construct()
     {
@@ -74,69 +62,6 @@ class Doctor implements PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    /**
-     *
-     * @deprecated since Symfony 5.3, use getUserIdentifier instead
-     */
-    public function getUsername(): string
-    {
-        return (string) $this->username;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @Ignore()
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->username;
-    }
-
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Returning a salt is only needed, if you are not using a modern
-     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
-     *
-     * @Ignore()
-     * @see UserInterface
-     */
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     /**
@@ -234,6 +159,18 @@ class Doctor implements PasswordAuthenticatedUserInterface
         if ($this->doctorMedicines->removeElement($doctorMedicine)) {
             $doctorMedicine->removeDoctor($this);
         }
+
+        return $this;
+    }
+
+    public function getFkUser(): ?User
+    {
+        return $this->fk_user;
+    }
+
+    public function setFkUser(User $fk_user): self
+    {
+        $this->fk_user = $fk_user;
 
         return $this;
     }

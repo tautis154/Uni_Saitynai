@@ -64,7 +64,7 @@ admin_edit:
 
 #Visit
 visits_list:
-  path: /api/visits
+  path: /api/doctors/{doctor_id}/visits
   controller: App\Controller\VisitController:listAction
   methods: [GET]
 
@@ -74,25 +74,30 @@ visit_create:
   methods: [POST]
 
 visit_find:
-  path: /api/visits/{id}
+  path: /api/doctors/{doctor_id}/visits/{visit_id}
   controller: App\Controller\VisitController:findAction
   methods: [GET]
   requirements:
     id: '\d+'
 
 visit_delete:
-  path: /api/visits/{id}
+  path: /api/doctors/{doctor_id}/visits/{visit_id}
   controller: App\Controller\VisitController:deleteAction
   methods: [DELETE]
   requirements:
     id: '\d+'
 
 visit_edit:
-  path: /api/visits/{id}
+  path: /api/doctors/{doctor_id}/visits/{visit_id}
   controller: App\Controller\VisitController:editAction
   methods: [PUT]
   requirements:
     id: '\d+'
+
+#visit_admin:
+
+#visit_finish:
+
 
 #Review
 reviews_list:
@@ -157,3 +162,39 @@ medicine_edit:
   methods: [PUT]
   requirements:
     id: '\d+'
+
+#Register User (Cia tik adminai gali keist)
+users_list:
+  path: /api/users
+  controller: App\Controller\RegistrationController:listAction
+  methods: [GET]
+
+user_create:
+  path: /api/register
+  controller: App\Controller\RegistrationController:register
+  methods: [POST]
+
+user_find:
+  path: /api/users/{id}
+  controller: App\Controller\RegistrationController:findAction
+  methods: [GET]
+  requirements:
+    id: '\d+'
+
+user_delete:
+  path: /api/users/{id}
+  controller: App\Controller\RegistrationController:deleteAction
+  methods: [DELETE]
+  requirements:
+    id: '\d+'
+
+user_edit:
+  path: /api/users/{id}
+  controller: App\Controller\RegistrationController:editAction
+  methods: [PUT]
+  requirements:
+    id: '\d+'
+
+api_login_check:
+  path: /api/login_check
+

@@ -26,6 +26,7 @@ class ReviewController extends AbstractApiController
     {
         $doctorId = $request->get('doctor_id');
 
+        //Cia reikia is user class, bet reikia patikrint ar role yra doctor ar ne
         $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
             'id' => $doctorId,
         ]);
@@ -38,7 +39,7 @@ class ReviewController extends AbstractApiController
 
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
+        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 
@@ -58,7 +59,6 @@ class ReviewController extends AbstractApiController
     public function listAction(Request $request): Response
     {
         $doctorId = $request->get('doctor_id');
-
 
         $reviews = $this->getDoctrine()->getRepository(Review::class)->findBy(['doctor' => $doctorId]);
 

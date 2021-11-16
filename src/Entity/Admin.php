@@ -4,17 +4,15 @@ namespace App\Entity;
 
 use App\Repository\AdminRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AdminRepository::class)
  * @ORM\Table(name="`admin`")
+ * @UniqueEntity(fields={"fk_user"}, message="There is already an admin with this user_id")
  */
-class Admin implements PasswordAuthenticatedUserInterface
+class Admin
 {
     /**
      * @ORM\Id
@@ -24,15 +22,15 @@ class Admin implements PasswordAuthenticatedUserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"},  fetch="EAGER")
+     * @ORM\JoinColumn(nullable=false, unique=true)
      */
-    private $username;
+    private $fk_user;
 
     /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=255)
      */
-    private $password;
+    private $name;
 
     public function __construct()
     {
@@ -44,64 +42,27 @@ class Admin implements PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    /**
-     * @deprecated since Symfony 5.3, use getUserIdentifier instead
-     */
-    public function getUsername(): string
+    public function getFkUser(): ?User
     {
-        return (string) $this->username;
+        return $this->fk_user;
     }
 
-    public function setUsername(string $username): self
+    public function setFkUser(User $fk_user): self
     {
-        $this->username = $username;
+        $this->fk_user = $fk_user;
 
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @Ignore()
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
+    public function getName(): ?string
     {
-        return (string) $this->username;
+        return $this->name;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): string
+    public function setName(string $name): self
     {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
+        $this->name = $name;
 
         return $this;
-    }
-
-    /**
-     * Returning a salt is only needed, if you are not using a modern
-     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
-     *
-     * @see UserInterface
-     */
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 }

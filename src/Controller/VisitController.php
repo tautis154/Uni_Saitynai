@@ -49,54 +49,95 @@ class VisitController extends AbstractApiController
 
     public function listAction(Request $request): Response
     {
-        $visits = $this->getDoctrine()->getRepository(Visit::class)->findAll();
+        $doctorId = $request->get('doctor_id');
+
+        $visits = $this->getDoctrine()->getRepository(Visit::class)->findBy(['doctor' => $doctorId]);
 
         if (!$visits) {
             return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($visits);
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'id' => $doctorId,
+        ]);
+
+        $currentUser = $this->getUser();
+
+        if ($doctor->getFkUser() === $currentUser || in_array("ROLE_ADMIN", $currentUser->getRoles(), true)) {
+            return $this->json($visits);
+        } else {
+            return $this->respond('403 Access Denied', Response::HTTP_FORBIDDEN);
+        }
     }
 
     public function findAction(Request $request)
     {
-        $visitId = $request->get('id');
+        $doctorId = $request->get('doctor_id');
+
+        $visitId = $request->get('visit_id');
 
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
             'id' => $visitId,
+            'doctor' => $doctorId
         ]);
 
         if (!$visit) {
             return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($visit);
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'id' => $doctorId,
+        ]);
+
+        $currentUser = $this->getUser();
+
+        if ($doctor->getFkUser() === $currentUser || in_array("ROLE_ADMIN", $currentUser->getRoles(), true)) {
+            return $this->json($visit);
+        } else {
+            return $this->respond('403 Access Denied', Response::HTTP_FORBIDDEN);
+        }
     }
 
     public function deleteAction(Request $request): Response
     {
-        $visitId = $request->get('id');
+        $doctorId = $request->get('doctor_id');
+
+        $visitId = $request->get('visit_id');
 
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
             'id' => $visitId,
+            'doctor' => $doctorId
         ]);
 
         if (!$visit) {
             return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
         }
 
-        $this->getDoctrine()->getManager()->remove($visit);
-        $this->getDoctrine()->getManager()->flush();
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'id' => $doctorId,
+        ]);
 
-        return $this->respond('Successfully removed', Response::HTTP_NO_CONTENT);
+        $currentUser = $this->getUser();
+
+        if ($doctor->getFkUser() === $currentUser || in_array("ROLE_ADMIN", $currentUser->getRoles(), true)) {
+            $this->getDoctrine()->getManager()->remove($visit);
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->respond('Successfully removed', Response::HTTP_NO_CONTENT);
+        } else {
+            return $this->respond('403 Access Denied', Response::HTTP_FORBIDDEN);
+        }
     }
 
     public function editAction(Request $request)
     {
-        $visitId = $request->get('id');
+        $doctorId = $request->get('doctor_id');
+
+        $visitId = $request->get('visit_id');
 
         $visit = $this->getDoctrine()->getRepository(Visit::class)->findOneBy([
-            'id' => $visitId
+            'id' => $visitId,
+            'doctor' => $doctorId
         ]);
 
         if (!$visit) {

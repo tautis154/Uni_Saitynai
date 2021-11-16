@@ -4,21 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Admin;
 use App\Entity\Doctor;
-use App\Entity\Review;
-
+use App\Entity\User;
 use App\Form\AdminType;
-use App\Form\DoctorType;
-use App\Repository\ReviewRepository;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class AdminController extends AbstractApiController
 {
@@ -28,11 +18,26 @@ class AdminController extends AbstractApiController
 
        $form->handleRequest($request);
 
-       if (!$form->isSubmitted() || !$form->isValid()) {
+       if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
            return $this->respond($form, Response::HTTP_BAD_REQUEST);
        }
 
        $admin = $form->getData();
+
+       $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
+            'id' => $admin->getFkUser()->getId(),
+       ]);
+
+        $doctor = $this->getDoctrine()->getRepository(Doctor::class)->findOneBy([
+            'fk_user' => $admin->getFkUser(),
+        ]);
+
+        if ($doctor)
+        {
+            return $this->respond('400 Bad Request (Cannnot set user_id to admin because doctor already has same user_id)', Response::HTTP_BAD_REQUEST);
+        }
+
+       $user->setRoles(["ROLE_ADMIN"]);
 
         try {
             $this->getDoctrine()->getManager()->persist($admin);
@@ -48,7 +53,11 @@ class AdminController extends AbstractApiController
     {
         $admins = $this->getDoctrine()->getRepository(Admin::class)->findAll();
 
-       return $this->json($admins);
+        if (!$admins) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($admins);
     }
 
     public function findAction(Request $request)
@@ -62,6 +71,10 @@ class AdminController extends AbstractApiController
         $admin = $this->getDoctrine()->getRepository(Admin::class)->findOneBy([
             'id' => $adminId,
         ]);
+
+        if (!$admin) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
 
         return $this->json($admin);
     }
@@ -78,8 +91,12 @@ class AdminController extends AbstractApiController
             'id' => $adminId,
         ]);
 
-     //   $this->getDoctrine()->getManager()->remove($doctor);
-      //  $this->getDoctrine()->getManager()->flush();
+        if (!$admin) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $this->getDoctrine()->getManager()->remove($admin);
+        $this->getDoctrine()->getManager()->flush();
 
         return $this->respond('Successfully removed admin');
     }
@@ -92,29 +109,40 @@ class AdminController extends AbstractApiController
             throw new NotFoundHttpException('Admin not found');
         }
 
-        $admin = $this->getDoctrine()->getRepository(Admin::class)->findOneBy([
+        $originalAdmin = $this->getDoctrine()->getRepository(Admin::class)->findOneBy([
             'id' => $adminId,
         ]);
 
-        $form = $this->buildForm(AdminType::class, $admin, [
+
+        if (!$originalAdmin) {
+            return $this->respond('404 Not Found', Response::HTTP_NOT_FOUND);
+        }
+
+        $originalAdminUserId = $originalAdmin->getFkUser()->getId();
+
+        $form = $this->buildForm(AdminType::class, $originalAdmin, [
             'method' => $request->getMethod(),
         ]);
 
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
+        if (!$form->isSubmitted() || !$form->isValid() || $form->isEmpty()) {
             return $this->respond($form, Response::HTTP_BAD_REQUEST);
         }
 
         $admin = $form->getData();
 
-        try {
-            $this->getDoctrine()->getManager()->persist($admin);
-            $this->getDoctrine()->getManager()->flush();
-        } catch (\Exception $e) {
-            return $this->respond('Internal Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        if ($admin->getFkUser()->getId() === $originalAdminUserId) {
+            try {
+                $this->getDoctrine()->getManager()->persist($admin);
+                $this->getDoctrine()->getManager()->flush();
+            } catch (\Exception $e) {
+                return $this->respond('Internal Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
 
-        return $this->respond($admin);
+            return $this->respond($admin);
+        } else {
+            return $this->respond('400 Bad Request (Cannnot set new user_id to existing doctor)', Response::HTTP_BAD_REQUEST);
+        }
     }
 }
